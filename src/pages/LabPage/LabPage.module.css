@@ -1,0 +1,24 @@
+.page {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - var(--nav-height));
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.overlay {
+  position: absolute;
+  bottom: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: var(--z-content);
+}
+
+.hint {
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+}

@@ -1,0 +1,19 @@
+.heading {
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+}
+
+.text {
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
