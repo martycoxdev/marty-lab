@@ -19,6 +19,9 @@
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   color: var(--color-text);
   text-decoration: none;
 }
@@ -26,6 +29,18 @@
 .logo:hover {
   color: var(--color-accent);
   text-decoration: none;
+}
+
+/* Logo is black-on-white; invert to white in dark mode */
+.logoIcon {
+  width: 24px;
+  height: 24px;
+  filter: invert(1);
+  transition: filter var(--transition-base);
+}
+
+:global([data-theme='light']) .logoIcon {
+  filter: invert(0);
 }
 
 .links {

@@ -1,10 +1,17 @@
 .hero {
   position: relative;
-  min-height: 100vh;
+  height: calc(100vh - var(--nav-height));
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .hero {
+    height: auto;
+    min-height: calc(100vh - var(--nav-height));
+  }
 }
 
 .canvas {

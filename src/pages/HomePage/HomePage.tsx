@@ -4,19 +4,19 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ArrowRightIcon } from '@radix-ui/react-icons';
 import { Scene } from '../../components/three/Scene';
-import { FloatingMesh } from '../../components/three/FloatingMesh';
 import { Button } from '../../components/ui/Button';
 import { Dialog } from '../../components/ui/Dialog';
 import { Heading, Text } from '../../components/ui/Typography';
 import styles from './HomePage.module.css';
+import { WaveSphereMesh } from '../../components/three/WaveSphereMesh';
 
 function HeroScene() {
   return (
-    <Scene className={styles.canvas} cameraZ={4}>
+    <Scene className={styles.canvas} cameraZ={2}>
       <ambientLight intensity={0.4} />
       <pointLight position={[10, 10, 10]} intensity={1.5} />
       <pointLight position={[-10, -10, -5]} intensity={0.5} color="#6ee7b7" />
-      <FloatingMesh />
+      <WaveSphereMesh />
     </Scene>
   );
 }

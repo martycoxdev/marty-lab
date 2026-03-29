@@ -5,20 +5,20 @@ import {
   useEffect,
   useState,
   type ReactNode,
-} from 'react';
+} from "react";
 
-type Theme = 'dark' | 'light';
+type Theme = "dark" | "light";
 
-const STORAGE_KEY = 'marty-lab-theme';
+const STORAGE_KEY = "marty-lab-theme";
 
 function getInitialTheme(): Theme {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'light' || stored === 'dark') return stored;
+    if (stored === "light" || stored === "dark") return stored;
   } catch {
     // localStorage unavailable
   }
-  return 'dark';
+  return "dark";
 }
 
 interface ThemeContextValue {
@@ -41,7 +41,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   const toggle = useCallback(
-    () => setTheme(prev => (prev === 'dark' ? 'light' : 'dark')),
+    () => setTheme((prev) => (prev === "dark" ? "light" : "dark")),
     [],
   );
 
@@ -52,8 +52,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error('useTheme must be used within ThemeProvider');
+  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
   return ctx;
 }

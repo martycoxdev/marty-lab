@@ -1,0 +1,84 @@
+.card {
+  border: 1px solid var(--color-border);
+  width: 280px;
+  flex-shrink: 0;
+  transition: border-color var(--transition-fast);
+}
+
+.card:hover {
+  border-color: var(--color-accent);
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  text-align: left;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.company {
+  font-size: var(--font-base);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+
+.role {
+  font-size: var(--font-sm);
+  color: var(--color-muted);
+}
+
+.dates {
+  font-size: var(--font-xs);
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.chevron {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-muted);
+  transition: transform var(--transition-base);
+}
+
+.details {
+  overflow: hidden;
+}
+
+.blurbs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.blurb {
+  border-left: 2px solid var(--color-accent);
+  padding-left: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.blurbTitle {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.blurbText {
+  font-size: var(--font-xs);
+  color: var(--color-muted);
+  line-height: 1.6;
+}

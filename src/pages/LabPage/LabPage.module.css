@@ -1,24 +1,226 @@
 .page {
   position: relative;
-  width: 100%;
-  height: calc(100vh - var(--nav-height));
 }
 
-.canvas {
-  position: absolute;
+/* Canvas fixed in background — always visible as user scrolls */
+.background {
+  position: fixed;
   inset: 0;
+  top: var(--nav-height);
+  z-index: 0;
 }
 
-.overlay {
-  position: absolute;
-  bottom: var(--space-6);
-  left: 50%;
-  transform: translateX(-50%);
+/* Sits above the canvas, below the content. On mobile it intercepts all
+   touches so the canvas never sees them; on desktop it's invisible. */
+.canvasBlocker {
+  position: fixed;
+  inset: 0;
+  top: var(--nav-height);
+  z-index: 1;
   pointer-events: none;
-  z-index: var(--z-content);
+  touch-action: pan-y;
+}
+
+.canvasBlockerMobile {
+  pointer-events: auto;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  /* Pass pointer events through to canvas by default; re-enable on text */
+  pointer-events: none;
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────────── */
+.hero {
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-16) var(--space-8) var(--space-12);
+}
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  pointer-events: auto;
+}
+
+.titleClip {
+  overflow: hidden;
+}
+
+.title {
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.heroSubs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.subClip {
+  overflow: hidden;
 }
 
 .hint {
   letter-spacing: 0.06em;
-  text-transform: lowercase;
+}
+
+/* ── Content sections ───────────────────────────────────────────────────── */
+.section {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  padding: var(--space-16) var(--space-8);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-bg) 80%, transparent) 0%,
+    color-mix(in srgb, var(--color-bg) 40%, transparent) 60%,
+    transparent 100%
+  );
+}
+
+.sectionInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  max-width: 520px;
+  pointer-events: auto;
+}
+
+/* ── Scene section ──────────────────────────────────────────────────────── */
+.sceneLines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.overline {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-left: 2px solid var(--color-accent);
+  padding-left: var(--space-3);
+}
+
+.body {
+  line-height: 1.7;
+  max-width: 46ch;
+}
+
+.specs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.specGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.specGroupLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.autoTag {
+  color: var(--color-accent);
+}
+
+.specGroupGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8) var(--space-8);
+}
+
+.spec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  cursor: default;
+}
+
+.specKey {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.specVal {
+  color: var(--color-accent);
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  outline: none;
+  cursor: pointer;
+  margin-top: var(--space-2);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+}
+
+.slider:hover::-webkit-slider-thumb {
+  transform: scale(1.3);
+}
+
+
+/* ── Stack section ──────────────────────────────────────────────────────── */
+.actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.stackList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.stackItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-6);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.stackLabel {
+  font-weight: 500;
+}
+
+.stackDetail {
+  text-align: right;
 }
