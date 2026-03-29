@@ -18,7 +18,7 @@ export function SkillsSection({ stats, statement, skills }: SkillsSectionProps) 
   return (
     <section className={styles.section}>
       <div className={styles.stats}>
-        {stats.map(stat => (
+        {stats.map((stat) => (
           <div key={stat.label} className={styles.statItem}>
             <span className={styles.statValue}>
               <Counter target={stat.value} suffix={stat.suffix} />

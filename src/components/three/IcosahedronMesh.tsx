@@ -7,9 +7,10 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 
 interface IcosahedronMeshProps {
   color?: string;
+  detail?: number;
 }
 
-export function IcosahedronMesh({ color = '#6ee7b7' }: IcosahedronMeshProps) {
+export function IcosahedronMesh({ color = '#6ee7b7', detail = 3 }: IcosahedronMeshProps) {
   const meshRef = useRef<Mesh>(null);
   const anim = useRef({ rotY: 0, rotX: 0, scrollOffset: 0 });
 
@@ -35,7 +36,7 @@ export function IcosahedronMesh({ color = '#6ee7b7' }: IcosahedronMeshProps) {
     ScrollTrigger.create({
       start: 0,
       end: 'max',
-      onUpdate: self => {
+      onUpdate: (self) => {
         anim.current.scrollOffset = self.progress * Math.PI * 4;
       },
     });
@@ -49,7 +50,7 @@ export function IcosahedronMesh({ color = '#6ee7b7' }: IcosahedronMeshProps) {
 
   return (
     <mesh ref={meshRef}>
-      <icosahedronGeometry args={[1.2, 3]} />
+      <icosahedronGeometry key={detail} args={[1.2, detail]} />
       <meshStandardMaterial wireframe color={color} />
     </mesh>
   );

@@ -24,7 +24,13 @@ export function ContactSection({ linkedin, email }: ContactSectionProps) {
         trigger: sectionRef.current,
         start: 'top 70%',
         onEnter: () => {
-          gsap.to(items, { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.15, ease: 'power4.out' });
+          gsap.to(items, {
+            y: 0,
+            autoAlpha: 1,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: 'power4.out',
+          });
         },
         onLeaveBack: () => {
           gsap.set(items, { y: 80, autoAlpha: 0 });
@@ -50,11 +56,7 @@ export function ContactSection({ linkedin, email }: ContactSectionProps) {
           <LinkedInLogoIcon width={20} height={20} />
           <span>LinkedIn</span>
         </a>
-        <a
-          data-contact-item
-          href={`mailto:${email}`}
-          className={styles.link}
-        >
+        <a data-contact-item href={`mailto:${email}`} className={styles.link}>
           <EnvelopeClosedIcon width={20} height={20} />
           <span>{email}</span>
         </a>

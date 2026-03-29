@@ -1,5 +1,5 @@
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
-import { useTheme } from "../../context/ThemeContext";
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { useTheme } from '../../context/ThemeContext';
 
 interface LabEffectsProps {
   /** Multiplier applied on top of the theme-default intensity (1 = default) */
@@ -9,7 +9,7 @@ interface LabEffectsProps {
 export function LabEffects({ bloomMultiplier = 1 }: LabEffectsProps) {
   const { theme } = useTheme();
 
-  if (theme === "light") {
+  if (theme === 'light') {
     return (
       <EffectComposer>
         <Bloom

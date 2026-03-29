@@ -22,7 +22,9 @@
   border-color: var(--color-accent);
 }
 
-.swatch::-webkit-color-swatch-wrapper { padding: 0; }
+.swatch::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
 .swatch::-webkit-color-swatch {
   border: none;
   border-radius: calc(var(--radius-sm) - 2px);

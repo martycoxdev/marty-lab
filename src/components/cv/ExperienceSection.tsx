@@ -47,7 +47,13 @@ export function ExperienceSection({ jobs }: ExperienceSectionProps) {
         trigger: section,
         start: 'top 60%',
         onEnter: () => {
-          gsap.to(letters, { y: 0, autoAlpha: 1, duration: 0.6, stagger: 0.04, ease: 'power4.out' });
+          gsap.to(letters, {
+            y: 0,
+            autoAlpha: 1,
+            duration: 0.6,
+            stagger: 0.04,
+            ease: 'power4.out',
+          });
         },
         onLeaveBack: () => {
           gsap.set(letters, { y: 100, autoAlpha: 0 });

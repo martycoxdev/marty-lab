@@ -1,453 +1,202 @@
-import { useRef, useState, useMemo, useEffect } from "react";
-import { OrbitControls } from "@react-three/drei";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import ScrollTrigger from "gsap/ScrollTrigger";
-import SplitText from "gsap/SplitText";
-import { Button } from "../../components/ui/Button";
-import { HexColorInput } from "../../components/ui/HexColorInput";
-import { Scene } from "../../components/three/Scene";
-import { WaveSphereMesh } from "../../components/three/WaveSphereMesh";
-import { LabEffects } from "../../components/three/LabEffects";
-import { Text, Heading } from "../../components/ui/Typography";
-import styles from "./LabPage.module.css";
-
-const STACK = [
-  { label: "Three.js", detail: "WebGL renderer" },
-  { label: "React Three Fiber", detail: "Declarative R3F scene graph" },
-  { label: "GSAP", detail: "Animation engine + ScrollTrigger" },
-  { label: "React 19", detail: "Component framework" },
-  { label: "TypeScript", detail: "Type safety throughout" },
-  { label: "Vite", detail: "Build tooling" },
-];
-
-const PTS_OPTIONS = [16, 32, 64, 128, 256, 512];
-
-const rand = (min: number, max: number, step: number) =>
-  Math.round((min + Math.random() * (max - min)) / step) * step;
-
-function randomVibrantHex(): string {
-  const h = Math.floor(Math.random() * 360);
-  const s = 65 + Math.floor(Math.random() * 35); // 65–100 %
-  const l = 50 + Math.floor(Math.random() * 25); // 50–75 % — always bright enough to bloom
-  // HSL → hex
-  const sl = s / 100,
-    ll = l / 100;
-  const a = sl * Math.min(ll, 1 - ll);
-  const f = (n: number) => {
-    const k = (n + h / 30) % 12;
-    return Math.round(255 * (ll - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)))
-      .toString(16)
-      .padStart(2, "0");
-  };
-  return `#${f(0)}${f(8)}${f(4)}`;
-}
+import { useRef, useState, useMemo } from 'react';
+import { flushSync } from 'react-dom';
+import { OrbitControls } from '@react-three/drei';
+import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import ScrollTrigger from 'gsap/ScrollTrigger';
+import SplitText from 'gsap/SplitText';
+import { Scene } from '../../components/three/Scene';
+import { LabMenu } from './LabMenu';
+import { EXPERIMENT_META, type ExperimentId } from './experiments/index';
+import {
+  WaveSphereProvider,
+  WaveSphereScene,
+  WaveSpherePanel,
+} from './experiments/WaveSphere';
+import {
+  WireframeProvider,
+  WireframeScene,
+  WireframePanel,
+} from './experiments/Wireframe';
+import {
+  TorusKnotProvider,
+  TorusKnotScene,
+  TorusKnotPanel,
+} from './experiments/TorusKnot';
+import styles from './LabPage.module.css';
 
 export function LabPage() {
   const pageRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const panelContentRef = useRef<HTMLDivElement>(null);
+  const labTextRef = useRef<HTMLDivElement>(null);
+  const isTransitioning = useRef(false);
 
-  const [numBands, setNumBands] = useState(14);
-  const [waveFreq, setWaveFreq] = useState(6);
-  const [waveAmp, setWaveAmp] = useState(0.09);
-  const [ptsPerBand, setPtsPerBand] = useState(256);
-  const [lineWidth, setLineWidth] = useState(1);
-  const [lineColor, setLineColor] = useState("#6ee7b7");
-  const [bloomMultiplier, setBloomMultiplier] = useState(1);
+  // activeId — which menu item is highlighted (updates immediately on click)
+  const [activeId, setActiveId] = useState<ExperimentId>('wave-sphere');
+  // displayedId — which experiment is actually rendered (updates after exit animation)
+  const [displayedId, setDisplayedId] = useState<ExperimentId>('wave-sphere');
 
-  const isMobile = useMemo(
-    () => window.matchMedia("(hover: none)").matches,
-    [],
-  );
+  const [panelOpen, setPanelOpen] = useState(true);
 
-  function randomize() {
-    setNumBands(rand(2, 30, 1));
-    setWaveFreq(rand(1, 16, 1));
-    setWaveAmp(Math.round((0.01 + Math.random() * 0.39) * 100) / 100);
-    setPtsPerBand(PTS_OPTIONS[Math.floor(Math.random() * PTS_OPTIONS.length)]);
-    setLineWidth(rand(0.5, 16, 0.5));
-    setLineColor(randomVibrantHex());
-  }
+  const isMobile = useMemo(() => window.matchMedia('(hover: none)').matches, []);
 
-  const [isAuto, setIsAuto] = useState(false);
-  const autoCallRef = useRef<gsap.core.Tween | null>(null);
+  const activeExp = EXPERIMENT_META.find((e) => e.id === activeId)!;
 
-  useEffect(() => {
-    if (!isAuto) {
-      autoCallRef.current?.kill();
-      return;
-    }
-
-    const step = () => {
-      setWaveFreq(rand(2, 12, 1));
-      setWaveAmp(Math.round((0.02 + Math.random() * 0.26) * 100) / 100);
-      setLineWidth(rand(0.5, 6, 0.5));
-      setLineColor(randomVibrantHex());
-      setBloomMultiplier(Math.round((0.2 + Math.random() * 1.8) * 10) / 10);
-      // Vary interval slightly so it feels organic rather than metronomic
-      autoCallRef.current = gsap.delayedCall(2.5 + Math.random() * 2, step);
-    };
-
-    // Kick off immediately then loop
-    step();
-    return () => {
-      autoCallRef.current?.kill();
-    };
-  }, [isAuto]);
-
+  // ── Mount animations ──────────────────────────────────────────────────────
   useGSAP(
     () => {
-      const titleEl = pageRef.current?.querySelector("[data-lab-title]");
+      // "Lab" label entrance
+      const titleEl = labTextRef.current?.querySelector('[data-lab-title]');
       if (titleEl) {
         const split = new SplitText(titleEl, {
-          type: "lines,words",
-          linesClass: "splitLine",
-          wordsClass: "splitWord",
+          type: 'words',
+          wordsClass: 'sw',
         });
         gsap.from(split.words, {
           yPercent: 110,
           duration: 1,
           stagger: 0.06,
-          ease: "power4.out",
+          ease: 'power4.out',
           delay: 0.2,
         });
       }
 
-      gsap.from("[data-hero-sub]", {
-        yPercent: 110,
-        duration: 0.8,
-        stagger: 0.12,
-        ease: "power3.out",
-        delay: 0.7,
-      });
-
-      gsap.from("[data-scene-line]", {
-        x: -60,
-        autoAlpha: 0,
+      // Panel slides in from right
+      gsap.from(panelRef.current, {
+        x: '100%',
         duration: 0.9,
-        stagger: 0.15,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: "[data-scene-section]",
-          start: "top 65%",
-        },
+        ease: 'power4.out',
+        delay: 0.3,
       });
-
-      gsap.from("[data-spec]", {
-        y: 30,
-        autoAlpha: 0,
-        duration: 0.6,
-        stagger: 0.08,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: "[data-specs]",
-          start: "top 70%",
-        },
-      });
-
-      gsap.from("[data-stack-heading]", {
-        yPercent: 110,
-        duration: 0.8,
-        ease: "power4.out",
-        scrollTrigger: {
-          trigger: "[data-stack-section]",
-          start: "top 65%",
-        },
-      });
-
-      gsap.from("[data-stack-item]", {
-        x: 40,
-        autoAlpha: 0,
-        duration: 0.7,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: "[data-stack-section]",
-          start: "top 55%",
-        },
-      });
-
-      ScrollTrigger.refresh();
     },
     { scope: pageRef },
   );
 
+  // ── Panel toggle ──────────────────────────────────────────────────────────
+  function togglePanel() {
+    const next = !panelOpen;
+    setPanelOpen(next);
+    gsap.to(panelRef.current, {
+      x: next ? '0%' : '100%',
+      duration: 0.55,
+      ease: next ? 'power4.out' : 'power3.in',
+    });
+  }
+
+  // ── Experiment switching ──────────────────────────────────────────────────
+  function handleSwitch(next: ExperimentId) {
+    if (next === displayedId || isTransitioning.current) return;
+    isTransitioning.current = true;
+    setActiveId(next); // menu highlight updates immediately
+
+    gsap
+      .timeline()
+      // Exit: fade panel content + dim background
+      .to(panelContentRef.current, {
+        autoAlpha: 0,
+        x: -24,
+        duration: 0.25,
+        ease: 'power2.in',
+      })
+      .to(
+        bgRef.current,
+        {
+          autoAlpha: 0.3,
+          duration: 0.2,
+          ease: 'power2.in',
+        },
+        '<',
+      )
+      // Reset scroll first so the new experiment's ScrollTrigger sees position 0
+      .add(() => {
+        window.scrollTo(0, 0);
+        flushSync(() => setDisplayedId(next));
+        panelContentRef.current?.scrollTo({ top: 0 });
+      })
+      // Enter: slide content in from right + restore background
+      .fromTo(
+        panelContentRef.current,
+        { autoAlpha: 0, x: 24 },
+        { autoAlpha: 1, x: 0, duration: 0.45, ease: 'power3.out' },
+      )
+      .to(
+        bgRef.current,
+        {
+          autoAlpha: 1,
+          duration: 0.35,
+          ease: 'power2.out',
+        },
+        '<0.05',
+      )
+      .add(() => {
+        ScrollTrigger.refresh();
+        isTransitioning.current = false;
+      });
+  }
+
   return (
-    <div ref={pageRef} className={styles.page}>
-      <div className={styles.background}>
-        <Scene cameraZ={5}>
-          <ambientLight intensity={0.1} />
-          {/* Coloured point lights illuminate the inner sphere for depth */}
-          <pointLight position={[6, 6, 6]} intensity={4} color="#6ee7b7" />
-          <pointLight position={[-6, -4, -6]} intensity={3} color="#a78bfa" />
-          <pointLight position={[0, -8, 4]} intensity={2} color="#f472b6" />
+    // All experiment Providers wrap the whole page so their Scene + Panel
+    // components share the same context instance. All 4 are always mounted
+    // so state persists when switching back to a previous experiment.
+    <WaveSphereProvider>
+      <WireframeProvider>
+        <TorusKnotProvider>
+          <div ref={pageRef} className={styles.page}>
+            {/* ── Three.js background ─────────────────────────────────── */}
+            <div ref={bgRef} className={styles.background}>
+              <Scene cameraZ={5}>
+                {displayedId === 'wave-sphere' && <WaveSphereScene />}
+                {displayedId === 'wireframe' && <WireframeScene />}
+                {displayedId === 'torus-knot' && <TorusKnotScene />}
+                {activeExp.orbitControls && (
+                  <OrbitControls
+                    enablePan={false}
+                    enableZoom={false}
+                    enableRotate={!isMobile}
+                    autoRotate={false}
+                  />
+                )}
+              </Scene>
+            </div>
 
-          <WaveSphereMesh
-            numBands={numBands}
-            waveFreq={waveFreq}
-            waveAmp={waveAmp}
-            segments={ptsPerBand}
-            lineWidth={lineWidth}
-            color={lineColor}
-          />
-          <LabEffects bloomMultiplier={bloomMultiplier} />
-          <OrbitControls
-            enablePan={false}
-            enableZoom={false}
-            enableRotate={!isMobile}
-            minDistance={0.1}
-            maxDistance={12}
-            autoRotate={false}
-          />
-        </Scene>
-      </div>
+            {/* Mobile touch blocker */}
+            <div
+              className={`${styles.canvasBlocker}${isMobile ? ` ${styles.canvasBlockerMobile}` : ''}`}
+            />
 
-      {/* Intercepts touches on mobile so the canvas never sees them */}
-      <div
-        className={`${styles.canvasBlocker}${isMobile ? ` ${styles.canvasBlockerMobile}` : ""}`}
-      />
+            {/* ── Experiment panel ──────────────────────────────────── */}
+            <div ref={panelRef} className={styles.panel}>
+              {/* Scrollable content area */}
+              <div ref={panelContentRef} className={styles.panelInner}>
+                {displayedId === 'wave-sphere' && <WaveSpherePanel />}
+                {displayedId === 'wireframe' && <WireframePanel />}
+                {displayedId === 'torus-knot' && <TorusKnotPanel />}
+              </div>
 
-      <div className={styles.content}>
-        {/* ── Hero ── */}
-        <section className={styles.hero}>
-          <div className={styles.heroText}>
-            <div className={styles.titleClip}>
-              <Heading
-                as="h1"
-                size="6xl"
-                data-lab-title
-                className={styles.title}
+              {/* Toggle tab — always visible, floats off the right edge */}
+              <button
+                className={styles.panelToggle}
+                onClick={togglePanel}
+                aria-label={panelOpen ? 'Hide panel' : 'Show panel'}
               >
-                Lab
-              </Heading>
+                {panelOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              </button>
             </div>
-            <div className={styles.heroSubs}>
-              <div className={styles.subClip}>
-                <Text size="lg" muted data-hero-sub>
-                  An experimental space for GSAP + Three.js
-                </Text>
-              </div>
-              <div className={styles.subClip}>
-                <Text
-                  size="xs"
-                  mono
-                  muted
-                  data-hero-sub
-                  className={styles.hint}
-                >
-                  drag to orbit · scroll to zoom
-                </Text>
-              </div>
-            </div>
+
+            {/* ── Experiment selector menu ───────────────────────────── */}
+            <LabMenu active={activeId} onChange={handleSwitch} />
+
+            {/* ── Scroll space ──────────────────────────────────────── */}
+            {/* All chrome is position:fixed, so this invisible spacer   */}
+            {/* is the only thing that creates page scroll height.        */}
+            {/* ScrollTrigger reads window scroll against this length.    */}
+            <div className={styles.scrollSpace} aria-hidden="true" />
           </div>
-        </section>
-
-        {/* ── Scene ── */}
-        <section className={styles.section} data-scene-section>
-          <div className={styles.sectionInner}>
-            <div className={styles.sceneLines}>
-              <Text
-                size="xs"
-                mono
-                muted
-                data-scene-line
-                className={styles.overline}
-              >
-                geometry
-              </Text>
-              <Heading as="h2" size="3xl" data-scene-line>
-                Wave sphere
-              </Heading>
-              <Text size="base" muted data-scene-line className={styles.body}>
-                A sphere where each latitude ring traces a sine curve on the
-                surface — oscillating in the polar direction as it travels
-                around the azimuth. Rotation makes the waves appear to travel.
-              </Text>
-            </div>
-
-            <div className={styles.specs} data-specs>
-              {/* Structure — fixed; not affected by Auto */}
-              <div className={styles.specGroup} data-spec>
-                <Text size="xs" mono muted className={styles.specGroupLabel}>
-                  structure
-                </Text>
-                <div className={styles.specGroupGrid}>
-                  <label className={styles.spec}>
-                    <Text size="xs" mono muted className={styles.specKey}>
-                      bands
-                    </Text>
-                    <Text size="sm" mono className={styles.specVal}>
-                      {numBands}
-                    </Text>
-                    <input
-                      type="range"
-                      min={2}
-                      max={30}
-                      step={1}
-                      value={numBands}
-                      onChange={(e) => setNumBands(Number(e.target.value))}
-                      className={styles.slider}
-                    />
-                  </label>
-
-                  <label className={styles.spec}>
-                    <Text size="xs" mono muted className={styles.specKey}>
-                      pts / band
-                    </Text>
-                    <Text size="sm" mono className={styles.specVal}>
-                      {ptsPerBand}
-                    </Text>
-                    <input
-                      type="range"
-                      min={0}
-                      max={PTS_OPTIONS.length - 1}
-                      step={1}
-                      value={PTS_OPTIONS.indexOf(ptsPerBand)}
-                      onChange={(e) =>
-                        setPtsPerBand(PTS_OPTIONS[Number(e.target.value)])
-                      }
-                      className={styles.slider}
-                    />
-                  </label>
-                </div>
-              </div>
-
-              {/* Wave — cycled by Auto */}
-              <div className={styles.specGroup} data-spec>
-                <Text size="xs" mono muted className={styles.specGroupLabel}>
-                  wave
-                  {isAuto && <span className={styles.autoTag}> · auto</span>}
-                </Text>
-                <div className={styles.specGroupGrid}>
-                  <label className={styles.spec}>
-                    <Text size="xs" mono muted className={styles.specKey}>
-                      freq
-                    </Text>
-                    <Text size="sm" mono className={styles.specVal}>
-                      {waveFreq}
-                    </Text>
-                    <input
-                      type="range"
-                      min={1}
-                      max={16}
-                      step={1}
-                      value={waveFreq}
-                      onChange={(e) => setWaveFreq(Number(e.target.value))}
-                      className={styles.slider}
-                    />
-                  </label>
-
-                  <label className={styles.spec}>
-                    <Text size="xs" mono muted className={styles.specKey}>
-                      amplitude
-                    </Text>
-                    <Text size="sm" mono className={styles.specVal}>
-                      {waveAmp.toFixed(2)}
-                    </Text>
-                    <input
-                      type="range"
-                      min={0.01}
-                      max={0.4}
-                      step={0.01}
-                      value={waveAmp}
-                      onChange={(e) => setWaveAmp(Number(e.target.value))}
-                      className={styles.slider}
-                    />
-                  </label>
-
-                  <label className={styles.spec}>
-                    <Text size="xs" mono muted className={styles.specKey}>
-                      line width
-                    </Text>
-                    <Text size="sm" mono className={styles.specVal}>
-                      {lineWidth}px
-                    </Text>
-                    <input
-                      type="range"
-                      min={0.5}
-                      max={16}
-                      step={0.5}
-                      value={lineWidth}
-                      onChange={(e) => setLineWidth(Number(e.target.value))}
-                      className={styles.slider}
-                    />
-                  </label>
-
-                  <label className={styles.spec}>
-                    <Text size="xs" mono muted className={styles.specKey}>
-                      colour
-                    </Text>
-                    <Text size="sm" mono className={styles.specVal}>
-                      {lineColor}
-                    </Text>
-                    <HexColorInput value={lineColor} onChange={setLineColor} />
-                  </label>
-
-                  <label className={styles.spec}>
-                    <Text size="xs" mono muted className={styles.specKey}>
-                      bloom
-                    </Text>
-                    <Text size="sm" mono className={styles.specVal}>
-                      {bloomMultiplier.toFixed(1)}×
-                    </Text>
-                    <input
-                      type="range"
-                      min={0}
-                      max={2}
-                      step={0.1}
-                      value={bloomMultiplier}
-                      onChange={(e) =>
-                        setBloomMultiplier(Number(e.target.value))
-                      }
-                      className={styles.slider}
-                    />
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.actions}>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={randomize}
-                disabled={isAuto}
-              >
-                Randomize
-              </Button>
-              <Button
-                variant={isAuto ? "primary" : "outline"}
-                size="sm"
-                onClick={() => setIsAuto((v) => !v)}
-              >
-                {isAuto ? "Stop" : "Auto"}
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Stack ── */}
-        <section className={styles.section} data-stack-section>
-          <div className={styles.sectionInner}>
-            <div className={styles.titleClip}>
-              <Heading as="h2" size="3xl" data-stack-heading>
-                Stack
-              </Heading>
-            </div>
-            <ul className={styles.stackList}>
-              {STACK.map(({ label, detail }) => (
-                <li key={label} className={styles.stackItem} data-stack-item>
-                  <Text size="base" className={styles.stackLabel}>
-                    {label}
-                  </Text>
-                  <Text size="sm" muted className={styles.stackDetail}>
-                    {detail}
-                  </Text>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      </div>
-    </div>
+        </TorusKnotProvider>
+      </WireframeProvider>
+    </WaveSphereProvider>
   );
 }

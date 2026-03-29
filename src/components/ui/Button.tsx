@@ -21,8 +21,7 @@ export function Button({
         ? styles.ghost
         : styles.outline;
 
-  const sizeClass =
-    size === 'sm' ? styles.sm : size === 'lg' ? styles.lg : styles.md;
+  const sizeClass = size === 'sm' ? styles.sm : size === 'lg' ? styles.lg : styles.md;
 
   return (
     <button

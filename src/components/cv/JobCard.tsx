@@ -20,7 +20,12 @@ export function JobCard({ job, defaultOpen = false }: JobCardProps) {
       const details = detailsRef.current;
       if (!details) return;
       if (isOpen) {
-        gsap.to(details, { height: 'auto', opacity: 1, duration: 0.4, ease: 'power2.out' });
+        gsap.to(details, {
+          height: 'auto',
+          opacity: 1,
+          duration: 0.4,
+          ease: 'power2.out',
+        });
       } else {
         gsap.to(details, { height: 0, opacity: 0, duration: 0.3, ease: 'power2.in' });
       }
@@ -32,7 +37,7 @@ export function JobCard({ job, defaultOpen = false }: JobCardProps) {
     <div ref={cardRef} className={styles.card}>
       <button
         className={styles.header}
-        onClick={() => setIsOpen(o => !o)}
+        onClick={() => setIsOpen((o) => !o)}
         aria-expanded={isOpen}
       >
         <div className={styles.headerLeft}>
@@ -46,7 +51,11 @@ export function JobCard({ job, defaultOpen = false }: JobCardProps) {
         />
       </button>
 
-      <div ref={detailsRef} className={styles.details} style={{ height: 0, opacity: 0, overflow: 'hidden' }}>
+      <div
+        ref={detailsRef}
+        className={styles.details}
+        style={{ height: 0, opacity: 0, overflow: 'hidden' }}
+      >
         <div className={styles.blurbs}>
           {job.blurbs.map((blurb, i) => (
             <div key={i} className={styles.blurb}>

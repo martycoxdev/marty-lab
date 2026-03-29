@@ -2,7 +2,7 @@
   position: relative;
 }
 
-/* Canvas fixed in background — always visible as user scrolls */
+/* ── Three.js canvas (fixed full-screen background) ────────────────────── */
 .background {
   position: fixed;
   inset: 0;
@@ -10,8 +10,7 @@
   z-index: 0;
 }
 
-/* Sits above the canvas, below the content. On mobile it intercepts all
-   touches so the canvas never sees them; on desktop it's invisible. */
+/* Mobile touch interceptor — sits above canvas, below everything else */
 .canvasBlocker {
   position: fixed;
   inset: 0;
@@ -25,80 +24,92 @@
   pointer-events: auto;
 }
 
-.content {
-  position: relative;
-  z-index: 2;
-  /* Pass pointer events through to canvas by default; re-enable on text */
-  pointer-events: none;
+/* ── Experiment panel (fixed right sidebar) ──────────────────────────────── */
+.panel {
+  position: fixed;
+  right: 0;
+  top: var(--nav-height);
+  bottom: 0;
+  width: 380px;
+  z-index: 60;
+  /* overflow: visible so the toggle tab peeks out to the left */
 }
 
-/* ── Hero ───────────────────────────────────────────────────────────────── */
-.hero {
-  min-height: calc(100vh - var(--nav-height));
-  display: flex;
-  align-items: flex-end;
-  padding: var(--space-16) var(--space-8) var(--space-12);
-}
-
-.heroText {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-  pointer-events: auto;
-}
-
-.titleClip {
-  overflow: hidden;
-}
-
-.title {
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
-
-.heroSubs {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.subClip {
-  overflow: hidden;
-}
-
-.hint {
-  letter-spacing: 0.06em;
-}
-
-/* ── Content sections ───────────────────────────────────────────────────── */
-.section {
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
-  padding: var(--space-16) var(--space-8);
+/* Scrollable content area within the panel */
+.panelInner {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   background: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--color-bg) 80%, transparent) 0%,
-    color-mix(in srgb, var(--color-bg) 40%, transparent) 60%,
+    -105deg,
+    color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
+    color-mix(in srgb, var(--color-bg) 75%, transparent) 65%,
     transparent 100%
   );
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
 }
 
-.sectionInner {
+.panelInner::-webkit-scrollbar {
+  width: 4px;
+}
+.panelInner::-webkit-scrollbar-track {
+  background: transparent;
+}
+.panelInner::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+/* Toggle tab — sticks out to the left of the panel.
+   When panel is hidden (x = 380px), this tab sits at the very right edge
+   of the viewport, acting as a pull handle. */
+.panelToggle {
+  position: absolute;
+  top: 50%;
+  left: -44px;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 72px;
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  border: 1px solid var(--color-border);
+  border-right: none;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+  z-index: 1;
+}
+
+.panelToggle:hover {
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-surfaceRaised) 95%, transparent);
+}
+
+/* ── Experiment panel content layout ────────────────────────────────────── */
+.panelSection {
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
-  max-width: 520px;
-  pointer-events: auto;
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-6) 96px;
+  background: var(--color-surface);
 }
 
-/* ── Scene section ──────────────────────────────────────────────────────── */
-.sceneLines {
+.panelMeta {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
+/* ── Shared control styles (used by all experiment panels) ──────────────── */
 .overline {
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -108,7 +119,6 @@
 
 .body {
   line-height: 1.7;
-  max-width: 46ch;
 }
 
 .specs {
@@ -137,7 +147,7 @@
 .specGroupGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-8) var(--space-8);
+  gap: var(--space-6) var(--space-4);
 }
 
 .spec {
@@ -192,35 +202,48 @@
   transform: scale(1.3);
 }
 
-
-/* ── Stack section ──────────────────────────────────────────────────────── */
 .actions {
   display: flex;
   gap: var(--space-3);
 }
 
-.stackList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+/* Planet Approach — technique breakdown table */
+.techniqueList {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-.stackItem {
+.techniqueRow {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: var(--space-6);
-  padding: var(--space-3) 0;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
   border-bottom: 1px solid var(--color-border);
 }
 
-.stackLabel {
-  font-weight: 500;
+.techniqueVal {
+  color: var(--color-muted);
+  text-align: right;
 }
 
-.stackDetail {
-  text-align: right;
+/* ── Scroll space ───────────────────────────────────────────────────────── */
+/* All chrome is position:fixed. This invisible block is the only thing     */
+/* that gives the page scroll height — ScrollTrigger measures against it.   */
+.scrollSpace {
+  height: 300vh;
+  pointer-events: none;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .panel {
+    width: 320px;
+  }
+
+  .labLabelWrap {
+    left: var(--space-4);
+    bottom: var(--space-6);
+  }
 }

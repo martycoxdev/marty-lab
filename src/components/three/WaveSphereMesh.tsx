@@ -1,10 +1,10 @@
-import { useMemo, useRef, useEffect } from "react";
-import * as THREE from "three";
-import type { Group } from "three";
-import { Line } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import gsap from "gsap";
-import { useTheme } from "../../context/ThemeContext";
+import { useMemo, useRef, useEffect } from 'react';
+import * as THREE from 'three';
+import type { Group } from 'three';
+import { Line } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import gsap from 'gsap';
+import { useTheme } from '../../context/ThemeContext';
 
 interface WaveSphereMeshProps {
   radius?: number;
@@ -67,9 +67,8 @@ export function WaveSphereMesh({
   const scrollScale = useRef(1);
   const { theme } = useTheme();
 
-  const resolvedColor =
-    colorProp ?? (theme === "light" ? "#047857" : "#6ee7b7");
-  const resolvedLineWidth = lineWidthProp ?? (theme === "light" ? 2 : 1);
+  const resolvedColor = colorProp ?? (theme === 'light' ? '#047857' : '#6ee7b7');
+  const resolvedLineWidth = lineWidthProp ?? (theme === 'light' ? 2 : 1);
 
   // ── Animated wave params ─────────────────────────────────────────────────
   // GSAP tweens this ref; useFrame reads it each tick — no React re-renders.
@@ -88,7 +87,7 @@ export function WaveSphereMesh({
       waveAmp,
       lineWidth: resolvedLineWidth,
       duration: 2,
-      ease: "power2.inOut",
+      ease: 'power2.inOut',
     });
     return () => {
       waveTweenRef.current?.kill();
@@ -128,10 +127,8 @@ export function WaveSphereMesh({
     const t = clock.getElapsedTime();
 
     // Scroll-driven scale
-    const maxScroll =
-      document.documentElement.scrollHeight - window.innerHeight;
-    const progress =
-      maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0;
     scrollScale.current += (1 + progress * 2 - scrollScale.current) * 0.08;
 
     groupRef.current.rotation.y = (t / 14) * Math.PI * 1.3;
@@ -148,9 +145,7 @@ export function WaveSphereMesh({
     lineRefs.current.forEach((line, i) => {
       if (!line || i >= numBands) return;
       const thetaCentre = ((i + 1) / (numBands + 1)) * Math.PI;
-      line.geometry.setPositions(
-        buildBandFlat(thetaCentre, radius, amp, freq, segments),
-      );
+      line.geometry.setPositions(buildBandFlat(thetaCentre, radius, amp, freq, segments));
       line.material.linewidth = lw;
       line.material.color.copy(currentColor.current);
     });

@@ -52,7 +52,7 @@ export function CvHero({ name, descriptors }: CvHeroProps) {
         </h1>
       </div>
       <div className={styles.descriptors}>
-        {descriptors.map(d => (
+        {descriptors.map((d) => (
           <div key={d} className={styles.descriptorClip}>
             <span data-descriptor className={styles.descriptor}>
               {d}

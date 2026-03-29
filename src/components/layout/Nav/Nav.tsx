@@ -53,11 +53,6 @@ export function Nav() {
             cv
           </NavLink>
         </li>
-        <li>
-          <NavLink to="/about" className={getLinkClass}>
-            about
-          </NavLink>
-        </li>
       </ul>
       <button
         onClick={toggle}
