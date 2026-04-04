@@ -72,8 +72,16 @@
   letter-spacing: 0.01em;
 }
 
+@media (max-width: 768px) {
+  /* Move menu above the 3D scene, below the nav, to avoid bottom sheet collision */
+  .menu {
+    bottom: auto;
+    top: calc(var(--nav-height) + var(--space-3));
+  }
+}
+
 @media (max-width: 600px) {
-  .num {
+  .label {
     display: none;
   }
 

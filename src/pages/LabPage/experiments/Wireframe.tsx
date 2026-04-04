@@ -124,14 +124,13 @@ export function WireframePanel() {
           Icosahedron
         </Heading>
         <Text size="base" muted data-line className={styles.body}>
-          A geodesic wireframe built by recursively subdividing an icosahedron — the most
-          spherical of the Platonic solids. Each level quadruples the triangle count.
+          A geodesic wireframe built by recursively subdividing an icosahedron. Each level quadruples the triangle count.
         </Text>
       </div>
 
       <div className={styles.specs}>
         <div className={styles.specGroup} data-ctrl>
-          <Text size="xs" mono muted className={styles.specGroupLabel}>
+          <Text size="xs" mono className={styles.specGroupLabel}>
             mesh
           </Text>
           <div className={styles.specGroupGrid}>

@@ -126,15 +126,14 @@ export function TorusKnotPanel() {
           Torus Knot
         </Heading>
         <Text size="base" muted data-line className={styles.body}>
-          A (2,3) torus knot — the trefoil. One of the simplest non-trivial knots, it
-          winds around the tube twice and the axis three times before closing. The camera
-          orbits freely; drag to explore the grooves.
+          A (2,3) torus knot - the trefoil.
+          It winds around the tube twice and the axis three times before closing.
         </Text>
       </div>
 
       <div className={styles.specs}>
         <div className={styles.specGroup} data-ctrl>
-          <Text size="xs" mono muted className={styles.specGroupLabel}>
+          <Text size="xs" mono className={styles.specGroupLabel}>
             material
           </Text>
           <div className={styles.specGroupGrid}>

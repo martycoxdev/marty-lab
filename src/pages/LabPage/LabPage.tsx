@@ -1,7 +1,12 @@
 import { useRef, useState, useMemo } from 'react';
 import { flushSync } from 'react-dom';
 import { OrbitControls } from '@react-three/drei';
-import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+} from '@radix-ui/react-icons';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import ScrollTrigger from 'gsap/ScrollTrigger';
@@ -24,6 +29,11 @@ import {
   TorusKnotScene,
   TorusKnotPanel,
 } from './experiments/TorusKnot';
+import {
+  StreetProvider,
+  StreetScene,
+  StreetPanel,
+} from './experiments/Street';
 import styles from './LabPage.module.css';
 
 export function LabPage() {
@@ -39,11 +49,14 @@ export function LabPage() {
   // displayedId — which experiment is actually rendered (updates after exit animation)
   const [displayedId, setDisplayedId] = useState<ExperimentId>('wave-sphere');
 
-  const [panelOpen, setPanelOpen] = useState(true);
+  const isMobileLayout = useMemo(() => window.innerWidth <= 768, []);
+  const [panelOpen, setPanelOpen] = useState(false);
 
   const isMobile = useMemo(() => window.matchMedia('(hover: none)').matches, []);
 
-  const activeExp = EXPERIMENT_META.find((e) => e.id === activeId)!;
+  // Use displayedId so orbitControls/meta reflects the scene that's actually rendered,
+  // not the one that's merely highlighted in the menu during a transition.
+  const activeExp = EXPERIMENT_META.find((e) => e.id === displayedId)!;
 
   // ── Mount animations ──────────────────────────────────────────────────────
   useGSAP(
@@ -64,13 +77,12 @@ export function LabPage() {
         });
       }
 
-      // Panel slides in from right
-      gsap.from(panelRef.current, {
-        x: '100%',
-        duration: 0.9,
-        ease: 'power4.out',
-        delay: 0.3,
-      });
+      // Panel starts closed on all devices — set off-screen immediately
+      if (isMobileLayout) {
+        gsap.set(panelRef.current, { y: '100%' });
+      } else {
+        gsap.set(panelRef.current, { x: '100%' });
+      }
     },
     { scope: pageRef },
   );
@@ -79,11 +91,19 @@ export function LabPage() {
   function togglePanel() {
     const next = !panelOpen;
     setPanelOpen(next);
-    gsap.to(panelRef.current, {
-      x: next ? '0%' : '100%',
-      duration: 0.55,
-      ease: next ? 'power4.out' : 'power3.in',
-    });
+    if (isMobileLayout) {
+      gsap.to(panelRef.current, {
+        y: next ? '0%' : '100%',
+        duration: 0.55,
+        ease: next ? 'power4.out' : 'power3.in',
+      });
+    } else {
+      gsap.to(panelRef.current, {
+        x: next ? '0%' : '100%',
+        duration: 0.55,
+        ease: next ? 'power4.out' : 'power3.in',
+      });
+    }
   }
 
   // ── Experiment switching ──────────────────────────────────────────────────
@@ -144,6 +164,7 @@ export function LabPage() {
     <WaveSphereProvider>
       <WireframeProvider>
         <TorusKnotProvider>
+          <StreetProvider>
           <div ref={pageRef} className={styles.page}>
             {/* ── Three.js background ─────────────────────────────────── */}
             <div ref={bgRef} className={styles.background}>
@@ -151,8 +172,10 @@ export function LabPage() {
                 {displayedId === 'wave-sphere' && <WaveSphereScene />}
                 {displayedId === 'wireframe' && <WireframeScene />}
                 {displayedId === 'torus-knot' && <TorusKnotScene />}
+                {displayedId === 'street' && <StreetScene />}
                 {activeExp.orbitControls && (
                   <OrbitControls
+                    makeDefault
                     enablePan={false}
                     enableZoom={false}
                     enableRotate={!isMobile}
@@ -174,6 +197,7 @@ export function LabPage() {
                 {displayedId === 'wave-sphere' && <WaveSpherePanel />}
                 {displayedId === 'wireframe' && <WireframePanel />}
                 {displayedId === 'torus-knot' && <TorusKnotPanel />}
+                {displayedId === 'street' && <StreetPanel />}
               </div>
 
               {/* Toggle tab — always visible, floats off the right edge */}
@@ -182,7 +206,10 @@ export function LabPage() {
                 onClick={togglePanel}
                 aria-label={panelOpen ? 'Hide panel' : 'Show panel'}
               >
-                {panelOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                {isMobileLayout
+                  ? panelOpen ? <ChevronDownIcon /> : <ChevronUpIcon />
+                  : panelOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />
+                }
               </button>
             </div>
 
@@ -193,8 +220,13 @@ export function LabPage() {
             {/* All chrome is position:fixed, so this invisible spacer   */}
             {/* is the only thing that creates page scroll height.        */}
             {/* ScrollTrigger reads window scroll against this length.    */}
-            <div className={styles.scrollSpace} aria-hidden="true" />
+            <div
+              className={styles.scrollSpace}
+              style={{ height: `${EXPERIMENT_META.find(e => e.id === displayedId)?.scrollVh ?? 300}vh` }}
+              aria-hidden="true"
+            />
           </div>
+          </StreetProvider>
         </TorusKnotProvider>
       </WireframeProvider>
     </WaveSphereProvider>

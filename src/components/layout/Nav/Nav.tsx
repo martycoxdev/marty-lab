@@ -48,11 +48,11 @@ export function Nav() {
             lab
           </NavLink>
         </li>
-        <li>
+        {/* <li>
           <NavLink to="/cv" className={getLinkClass}>
             cv
           </NavLink>
-        </li>
+        </li> TEMPORARILY HIDDEN */}
       </ul>
       <button
         onClick={toggle}

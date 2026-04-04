@@ -43,7 +43,7 @@ export function HomePage() {
 
         <div className={styles.heroContent}>
           <Text size="sm" mono data-hero-tag className={styles.tag}>
-            creative playground
+            bitta fun innit
           </Text>
 
           <Heading as="h1" size="6xl" data-hero-title className={styles.heroTitle}>
@@ -67,15 +67,13 @@ export function HomePage() {
                 </Button>
               }
               title="marty-lab"
-              description="A personal creative playground built with React, GSAP, and Three.js."
+              // description="A personal creative playground built with React, GSAP, and Three.js."
             >
               <Text muted size="sm">
-                This site is a space to experiment with web animations, 3D graphics, and
-                UI interactions. Built with Vite, React 19, GSAP 3, React Three Fiber,
-                Radix UI primitives, and CSS Modules.
+                Jez: How thick is wall?
               </Text>
-              <Text muted size="sm" style={{ marginTop: '0.75rem' }}>
-                Eventually it might grow into a portfolio or CV. For now — just for fun.
+              <Text muted size="sm">
+                Mark: Depends.
               </Text>
             </Dialog>
           </div>

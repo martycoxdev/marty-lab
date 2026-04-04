@@ -39,6 +39,8 @@
 .panelInner {
   position: absolute;
   inset: 0;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
   background: linear-gradient(
@@ -96,6 +98,7 @@
 
 /* ── Experiment panel content layout ────────────────────────────────────── */
 .panelSection {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
@@ -107,6 +110,26 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+.credit {
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-xs);
+  font-family: var(--font-mono);
+  color: var(--color-muted);
+}
+
+.credit a {
+  color: var(--color-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+.credit a:hover {
+  color: var(--color-text);
 }
 
 /* ── Shared control styles (used by all experiment panels) ──────────────── */
@@ -135,9 +158,12 @@
 
 .specGroupLabel {
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
+  font-size: var(--font-xs);
+  font-weight: 600;
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--color-border);
+  color: color-mix(in srgb, var(--color-text) 55%, var(--color-muted));
 }
 
 .autoTag {
@@ -146,8 +172,8 @@
 
 .specGroupGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-6) var(--space-4);
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
 }
 
 .spec {
@@ -232,18 +258,50 @@
 /* All chrome is position:fixed. This invisible block is the only thing     */
 /* that gives the page scroll height — ScrollTrigger measures against it.   */
 .scrollSpace {
-  height: 300vh;
   pointer-events: none;
 }
 
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
+  /* Panel becomes a bottom sheet — full width, slides up from the bottom */
   .panel {
-    width: 320px;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: min(68vh, 520px);
   }
 
-  .labLabelWrap {
-    left: var(--space-4);
-    bottom: var(--space-6);
+  /* Flex column so panelSection always fills the full sheet height,
+     preventing a dark gap below short-content panels (Wireframe, TorusKnot) */
+  .panelInner {
+    display: flex;
+    flex-direction: column;
+    /* Drop the diagonal gradient; solid surface is cleaner for a sheet */
+    background: var(--color-surface);
+  }
+
+  /* panelSection fills remaining space; rounded top corners form the sheet edge */
+  .panelSection {
+    flex: 1;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-4) var(--space-6);
+    border-top: 1px solid var(--color-border);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  /* Toggle tab repositioned to top-center as a pull-up handle */
+  .panelToggle {
+    top: -44px;
+    left: 50%;
+    right: auto;
+    /* Reset the desktop translateY(-50%) */
+    transform: translateX(-50%);
+    width: 80px;
+    height: 44px;
+    border-right: 1px solid var(--color-border);
+    border-bottom: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
   }
 }

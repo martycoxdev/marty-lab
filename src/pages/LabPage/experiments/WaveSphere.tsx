@@ -219,14 +219,13 @@ export function WaveSpherePanel() {
         </Heading>
         <Text size="base" muted data-line className={styles.body}>
           Each latitude ring traces a sine curve on the sphere surface, oscillating in the
-          polar direction as it travels the azimuth. Rotation makes the waves appear to
-          travel.
+          polar direction as it travels the azimuth.
         </Text>
       </div>
 
       <div className={styles.specs}>
         <div className={styles.specGroup} data-ctrl>
-          <Text size="xs" mono muted className={styles.specGroupLabel}>
+          <Text size="xs" mono className={styles.specGroupLabel}>
             structure
           </Text>
           <div className={styles.specGroupGrid}>
@@ -270,7 +269,7 @@ export function WaveSpherePanel() {
         </div>
 
         <div className={styles.specGroup} data-ctrl>
-          <Text size="xs" mono muted className={styles.specGroupLabel}>
+          <Text size="xs" mono className={styles.specGroupLabel}>
             wave{isAuto && <span className={styles.autoTag}> · auto</span>}
           </Text>
           <div className={styles.specGroupGrid}>

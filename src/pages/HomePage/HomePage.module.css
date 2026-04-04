@@ -11,6 +11,8 @@
   .hero {
     height: auto;
     min-height: calc(100vh - var(--nav-height));
+    flex-direction: column;
+    margin-top: var(--space-4)
   }
 }
 

@@ -73,7 +73,7 @@ export function LabMenu({ active, onChange }: LabMenuProps) {
             onClick={() => onChange(id)}
             onMouseEnter={(e) => {
               if (active !== id) {
-                gsap.to(e.currentTarget, { y: -3, duration: 0.2, ease: 'power2.out' });
+                gsap.to(e.currentTarget, { y: -1, duration: 0.2, ease: 'power2.out' });
               }
             }}
             onMouseLeave={(e) => {
