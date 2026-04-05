@@ -8,7 +8,7 @@ Live at [marty99.com](https://marty99.com).
 
 - **React 19** + TypeScript, built with **Vite 6**
 - **GSAP 3** (`@gsap/react`) for animations
-- **Three.js** + **React Three Fiber v9** + **postprocessing** for 3D
+- **Three.js** + **React Three Fiber v9** + **drei** + **postprocessing** for 3D
 - **Radix UI** + `@radix-ui/react-icons` for UI primitives
 - **CSS Modules** + CSS custom properties for styling
 - **React Router v7** for client-side routing

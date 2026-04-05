@@ -56,10 +56,12 @@ src/
 │       ├── CvHero.tsx           # Hero block (name, descriptor)
 │       ├── ExperienceSection.tsx # Job history list
 │       ├── JobCard.tsx          # Individual job card
+│       ├── SkillsSection.tsx    # Skills list
 │       └── ContactSection.tsx   # Contact info
 ├── pages/
 │   ├── HomePage/                # Hero with Three.js background + GSAP entrance animation
 │   ├── LabPage/                 # Interactive R3F scene with OrbitControls + experiment switcher
+│   │   ├── LabMenu.tsx          # Experiment switcher UI overlay
 │   │   └── experiments/         # Individual experiment modules (WaveSphere, Wireframe, TorusKnot, Street)
 │   └── CvPage/                  # CV / résumé page (route temporarily hidden)
 ├── App.tsx                      # Routes + Nav layout shell
@@ -136,18 +138,15 @@ Files end in `.module.css`. Vite is configured with `localsConvention: 'camelCas
 
 React Router v7. Routes defined in `App.tsx`. Active routes: `/`, `/lab`. `/cv` is defined but temporarily commented out.
 
-CloudFront must redirect 403/404 → `/index.html` (200) for SPA routing on direct URL loads.
+GitHub Pages handles SPA routing via a `404.html` trick — the build step copies `index.html` → `dist/404.html` so direct URL loads are caught and served correctly.
 
-## AWS Deploy
+## Deploy
+
+Deployment is automated via GitHub Actions (`.github/workflows/deploy.yml`) on every push to `main`.
 
 ```bash
-pnpm build
-aws s3 sync dist/ s3://YOUR_BUCKET --delete
-aws cloudfront create-invalidation --distribution-id YOUR_ID --paths "/index.html"
+pnpm build   # output → dist/
+# push to main — Actions builds and deploys to GitHub Pages automatically
 ```
 
-**Cache strategy** (set via S3 metadata or CloudFront response headers policy):
-- `index.html` → `Cache-Control: no-cache, no-store`
-- `dist/assets/*` → `Cache-Control: max-age=31536000, immutable` (Vite hashes filenames)
-
-Architecture: private S3 bucket + Origin Access Control → CloudFront → ACM cert (us-east-1) → Route 53 → marty99.com
+Live at [marty99.com](https://marty99.com) (custom domain via `CNAME`).
