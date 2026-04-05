@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useNavigate } from 'react-router';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { ArrowRightIcon } from '@radix-ui/react-icons';
+import { ArrowRightIcon, GitHubLogoIcon } from '@radix-ui/react-icons';
 import { Scene } from '../../components/three/Scene';
 import { Button } from '../../components/ui/Button';
 import { Dialog } from '../../components/ui/Dialog';
@@ -75,6 +75,15 @@ export function HomePage() {
               <Text muted size="sm">
                 Mark: Depends.
               </Text>
+              <a
+                href="https://github.com/martycoxdev/marty-lab"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.repoLink}
+              >
+                <GitHubLogoIcon width={16} height={16} />
+                <span>martycoxdev/marty-lab</span>
+              </a>
             </Dialog>
           </div>
         </div>
