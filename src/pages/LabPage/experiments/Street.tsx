@@ -54,7 +54,7 @@ export function StreetProvider({ children }: { children: React.ReactNode }) {
 // ─── Model ───────────────────────────────────────────────────────────────────
 
 function HousesModel() {
-  const { scene } = useGLTF('/models/houses.glb');
+  const { scene } = useGLTF(`${import.meta.env.BASE_URL}models/houses.glb`);
 
   useMemo(() => {
     scene.traverse((obj) => {
@@ -74,7 +74,7 @@ function HousesModel() {
   return <primitive object={scene} />;
 }
 
-useGLTF.preload('/models/houses.glb');
+useGLTF.preload(`${import.meta.env.BASE_URL}models/houses.glb`);
 
 // ─── Scene ───────────────────────────────────────────────────────────────────
 
