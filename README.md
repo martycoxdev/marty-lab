@@ -8,22 +8,23 @@ Live at [marty99.com](https://marty99.com).
 
 - **React 19** + TypeScript, built with **Vite 6**
 - **GSAP 3** (`@gsap/react`) for animations
-- **Three.js** + **React Three Fiber** for 3D
-- **Radix UI** + **@radix-ui/react-icons** for accessible UI primitives
+- **Three.js** + **React Three Fiber v9** + **postprocessing** for 3D
+- **Radix UI** + `@radix-ui/react-icons` for UI primitives
 - **CSS Modules** + CSS custom properties for styling
 - **React Router v7** for client-side routing
-- Hosted on **AWS S3 + CloudFront**
+- Deployed via **GitHub Actions** → **GitHub Pages**
 
-## Development
+## Dev
 
-Requires Node 18+ and pnpm.
+Requires Node 18 and pnpm.
 
 ```bash
 pnpm install
 pnpm dev       # http://localhost:5173
 pnpm build     # production build → dist/
 pnpm preview   # preview production build
-pnpm lint      # ESLint
+pnpm lint
+pnpm format
 ```
 
 ## Pages
@@ -31,5 +32,4 @@ pnpm lint      # ESLint
 | Route | Description |
 |---|---|
 | `/` | Home — hero with Three.js background and GSAP entrance |
-| `/lab` | Interactive Three.js scene (drag to orbit, scroll to zoom) |
-| `/about` | Coming soon |
+| `/lab` | Interactive Three.js scene — swap between experiments (wave sphere, wireframe, torus knot, street) |
