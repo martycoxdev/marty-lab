@@ -9,6 +9,7 @@ pnpm dev          # Start dev server (http://localhost:5173)
 pnpm build        # TypeScript check + Vite production build → dist/
 pnpm preview      # Preview the production build locally
 pnpm lint         # Run ESLint
+pnpm format       # Prettier format src/**/*.{ts,tsx,css}
 ```
 
 ## Stack
@@ -18,7 +19,7 @@ pnpm lint         # Run ESLint
 | Build | Vite 6 (Node 18 max; Vite 7 requires Node 20+) |
 | Framework | React 19 + TypeScript |
 | Animations | GSAP 3 + `@gsap/react` |
-| 3D | Three.js + `@react-three/fiber` v9 + `@react-three/drei` |
+| 3D | Three.js + `@react-three/fiber` v9 + `@react-three/drei` + `@react-three/postprocessing` |
 | UI primitives | `radix-ui` (unified pkg) + `@radix-ui/react-icons` |
 | Styling | CSS Modules + CSS variables |
 | Routing | React Router v7 (`BrowserRouter`) |
@@ -29,7 +30,9 @@ pnpm lint         # Run ESLint
 ```
 src/
 ├── context/ThemeContext.tsx     # Theme state (dark/light), localStorage persistence
-├── lib/gsap.ts                  # Side-effect: registers GSAP plugins once
+├── lib/gsap.ts                  # Side-effect: registers GSAP plugins (useGSAP, ScrollTrigger, SplitText)
+├── data/experience.ts           # CV / work experience data
+├── hooks/useScrollReveal.ts     # Scroll-triggered reveal hook
 ├── styles/
 │   ├── tokens.css               # All CSS custom properties (colors, spacing, etc.)
 │   ├── reset.css                # CSS reset
@@ -39,14 +42,26 @@ src/
 │   ├── ui/
 │   │   ├── Button.tsx           # variant (primary | ghost | outline), size (sm | md | lg)
 │   │   ├── Typography.tsx       # Heading + Text components, size via inline style lookup
-│   │   └── Dialog.tsx           # Wraps Radix Dialog primitive with CSS Module styles
-│   └── three/
-│       ├── Scene.tsx            # R3F <Canvas> wrapper (camera, dpr, antialias)
-│       └── FloatingMesh.tsx     # Torus knot; demonstrates GSAP + R3F integration pattern
+│   │   ├── Dialog.tsx           # Wraps Radix Dialog primitive with CSS Module styles
+│   │   ├── Counter.tsx          # Animated counter
+│   │   ├── HexColorInput.tsx    # Hex colour picker input
+│   │   └── Marquee.tsx          # Scrolling ticker/marquee
+│   ├── three/
+│   │   ├── Scene.tsx            # R3F <Canvas> wrapper (camera, dpr, antialias)
+│   │   ├── FloatingMesh.tsx     # Torus knot; demonstrates GSAP + R3F integration pattern
+│   │   ├── WaveSphereMesh.tsx   # Animated wave sphere
+│   │   ├── IcosahedronMesh.tsx  # Icosahedron geometry
+│   │   └── LabEffects.tsx       # R3F post-processing effects
+│   └── cv/
+│       ├── CvHero.tsx           # Hero block (name, descriptor)
+│       ├── ExperienceSection.tsx # Job history list
+│       ├── JobCard.tsx          # Individual job card
+│       └── ContactSection.tsx   # Contact info
 ├── pages/
 │   ├── HomePage/                # Hero with Three.js background + GSAP entrance animation
-│   ├── LabPage/                 # Interactive R3F scene with OrbitControls
-│   └── AboutPage/               # Placeholder
+│   ├── LabPage/                 # Interactive R3F scene with OrbitControls + experiment switcher
+│   │   └── experiments/         # Individual experiment modules (WaveSphere, Wireframe, TorusKnot, Street)
+│   └── CvPage/                  # CV / résumé page (route temporarily hidden)
 ├── App.tsx                      # Routes + Nav layout shell
 └── main.tsx                     # Entry: side-effect imports, BrowserRouter, ThemeProvider
 ```
@@ -119,7 +134,7 @@ Files end in `.module.css`. Vite is configured with `localsConvention: 'camelCas
 
 ## Routing
 
-React Router v7. Routes defined in `App.tsx`. Current routes: `/`, `/lab`, `/about`.
+React Router v7. Routes defined in `App.tsx`. Active routes: `/`, `/lab`. `/cv` is defined but temporarily commented out.
 
 CloudFront must redirect 403/404 → `/index.html` (200) for SPA routing on direct URL loads.
 
